@@ -1,0 +1,7 @@
+[submodule "duckdb"]
+	path = duckdb
+	url = https://github.com/duckdb/duckdb
+	branch = main
+[submodule "saneql"]
+	path = saneql
+	url = git@github.com:maxi-k/saneql.git
