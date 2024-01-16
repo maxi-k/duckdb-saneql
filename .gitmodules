@@ -8,4 +8,4 @@
 	branch = main
 [submodule "saneql"]
 	path = saneql
-	url = git@github.com:maxi-k/saneql.git
+	url = https://github.com/maxi-k/saneql.git
