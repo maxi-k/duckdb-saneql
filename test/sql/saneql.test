@@ -1,0 +1,33 @@
+# name: test/sql/saneql.test
+# description: test saneql extension
+# group: [saneql]
+
+statement ok
+create table foo (a int);
+
+statement ok
+insert into foo values (1), (2), (3);
+
+# Before we load the extension, this will fail
+statement error
+foo;
+
+statement error
+foo.filter(a > 2);
+
+# Require statement will ensure this test is run with this extension loaded
+require saneql;
+
+# Confirm the extension works
+query I
+foo;
+---
+1
+2
+3
+
+query I
+foo.filter(a >= 2);
+---
+2
+3

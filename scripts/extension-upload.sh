@@ -58,9 +58,15 @@ cat $ext.sign >> $ext.append
 
 # compress extension binary
 if [[ $4 == wasm_* ]]; then
+<<<<<<< HEAD
   brotli < $ext.append > "$ext.compressed"
 else
   gzip < $ext.append > "$ext.compressed"
+=======
+  gzip < $ext.append > "$ext.compressed"
+else
+  brotli < $ext.append > "$ext.compressed"
+>>>>>>> 984d8b5 (Initial commit)
 fi
 
 set -e
@@ -74,6 +80,12 @@ fi
 # upload versioned version
 if [[ $7 = 'true' ]]; then
   if [[ $4 == wasm* ]]; then
+<<<<<<< HEAD
+=======
+    # Old style paths with additional duckdb-wasm
+    aws s3 cp $ext.compressed s3://$5/duckdb-wasm/$1/$2/duckdb-wasm/$3/$4/$1.duckdb_extension.wasm --acl public-read --content-encoding br --content-type="application/wasm"
+    # New style paths for duckdb-wasm, more uniforms
+>>>>>>> 984d8b5 (Initial commit)
     aws s3 cp $ext.compressed s3://$5/$1/$2/$3/$4/$1.duckdb_extension.wasm --acl public-read --content-encoding br --content-type="application/wasm"
   else
     aws s3 cp $ext.compressed s3://$5/$1/$2/$3/$4/$1.duckdb_extension.gz --acl public-read
@@ -83,6 +95,12 @@ fi
 # upload to latest version
 if [[ $6 = 'true' ]]; then
   if [[ $4 == wasm* ]]; then
+<<<<<<< HEAD
+=======
+    # Old style paths with additional duckdb-wasm
+    aws s3 cp $ext.compressed s3://$5/duckdb-wasm/$3/$4/$1.duckdb_extension.wasm --acl public-read --content-encoding br --content-type="application/wasm"
+    # New style paths for duckdb-wasm, more uniforms
+>>>>>>> 984d8b5 (Initial commit)
     aws s3 cp $ext.compressed s3://$5/$3/$4/$1.duckdb_extension.wasm --acl public-read --content-encoding br --content-type="application/wasm"
   else
     aws s3 cp $ext.compressed s3://$5/$3/$4/$1.duckdb_extension.gz --acl public-read

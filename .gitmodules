@@ -6,3 +6,6 @@
 	path = extension-ci-tools
 	url = https://github.com/duckdb/extension-ci-tools
 	branch = main
+[submodule "saneql"]
+	path = saneql
+	url = git@github.com:maxi-k/saneql.git
