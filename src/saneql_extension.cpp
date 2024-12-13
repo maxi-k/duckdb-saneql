@@ -22,7 +22,6 @@
 #include "sql/SQLWriter.hpp"
 //---------------------------------------------------------------------------
 // std
-#include <stdexcept>
 #include <map>
 #include <string_view>
 //---------------------------------------------------------------------------
@@ -44,7 +43,7 @@ void load_saneql(DatabaseInstance& db) {
    auto& config = DBConfig::GetConfig(db);
    SaneqlParserExtension saneql_parser;
    config.parser_extensions.push_back(saneql_parser);
-   config.operator_extensions.push_back(std::make_unique<SaneqlOperatorExtension>());
+   config.operator_extensions.push_back(make_uniq<SaneqlOperatorExtension>());
    log() << "loaded saneql extension" << std::endl;
 }
 //---------------------------------------------------------------------------
@@ -71,7 +70,7 @@ class SaneqlParserExtensionInfo : public ParserExtensionInfo {
 SaneqlParserExtension::SaneqlParserExtension() : ParserExtension() {
    parse_function = saneql_parse;
    plan_function = saneql_plan;
-   parser_info = std::make_shared<SaneqlParserExtensionInfo>();
+   parser_info = make_shared_ptr<SaneqlParserExtensionInfo>();
 }
 //---------------------------------------------------------------------------
 class SaneAST {
@@ -88,23 +87,32 @@ class SaneAST {
 
    public:
    AST& get() { return *parsed; }
+   std::string_view getQuery() const { return query; }
 };
 //---------------------------------------------------------------------------
 unique_ptr<ParserExtensionParseData> SaneqlParseData::Copy() const {
    log() << "copying parse data " << std::endl;
-   auto res = std::make_unique<SaneqlParseData>(ast);
+   auto res = make_uniq<SaneqlParseData>(ast);
    log() << "result ast: " << res->ast.get() << std::endl;
    return res;
 }
 //---------------------------------------------------------------------------
+string SaneqlParseData::ToString() const {
+   log() << "stringifying parse data " << std::endl;
+   std::stringstream result;
+   result << "(SaneqlParseData :ast (" << (this->ast)->getQuery() << "))";
+   return result.str();
+}
+//---------------------------------------------------------------------------
 /// parse saneql text to an ast
 ParserExtensionParseResult SaneqlParserExtension::saneql_parse(ParserExtensionInfo*, const std::string& query) {
+   using Res = ParserExtensionParseResult;
    try {
-      auto ast = std::make_shared<SaneAST>(query);
-      return {std::make_unique<SaneqlParseData>(ast)};
+      auto ast = make_shared_ptr<SaneAST>(query);
+      return Res(make_uniq<SaneqlParseData>(ast));
    } catch (std::exception& e) {
       log() << "saneql_parse error " << e.what() << std::endl;
-      return {e.what()};
+      return Res(e.what());
    }
 };
 //---------------------------------------------------------------------------

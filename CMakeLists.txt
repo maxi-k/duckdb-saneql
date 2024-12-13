@@ -10,15 +10,20 @@ add_definitions(-DDUCKDB_MINOR_VERSION=${DUCKDB_MINOR_VERSION})
 add_definitions(-DDUCKDB_PATCH_VERSION=${DUCKDB_PATCH_VERSION})
 
 # include saneql
-include_directories(SYSTEM saneql)
-add_subdirectory(saneql)
+include_directories(SYSTEM ${CMAKE_CURRENT_LIST_DIR}/saneql)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/saneql)
+install(
+  TARGETS saneql_static
+  EXPORT "${DUCKDB_EXPORT_SET}"
+  LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
+  ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
+)
 
 # saneql extension
 include_directories(src/include)
 
 set(EXTENSION_SOURCES src/saneql_extension.cpp)
 set(PARAMETERS "-warnings")
->>>>>>> 984d8b5 (Initial commit)
 
 build_static_extension(${TARGET_NAME} ${EXTENSION_SOURCES})
 build_loadable_extension(${TARGET_NAME} " " ${EXTENSION_SOURCES})
@@ -32,7 +37,7 @@ set_property(TARGET ${EXTENSION_NAME} PROPERTY CXX_STANDARD 20)
 set_property(TARGET ${LOADABLE_EXTENSION_NAME} PROPERTY CXX_STANDARD 20)
 
 install(
-  TARGETS ${EXTENSION_NAME} ${LOADABLE_EXTENSION_NAME} saneql_static
+  TARGETS ${EXTENSION_NAME}
   EXPORT "${DUCKDB_EXPORT_SET}"
   LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
   ARCHIVE DESTINATION "${INSTALL_LIB_DIR}")
@@ -51,3 +56,4 @@ message(STATUS "     DUCKDB_VERSION             = ${DUCKDB_VERSION}")
 message(STATUS "     DUCKDB_MAJOR_VERSION       = ${DUCKDB_MAJOR_VERSION}")
 message(STATUS "     DUCKDB_MINOR_VERSION       = ${DUCKDB_MINOR_VERSION}")
 message(STATUS "     DUCKDB_PATCH_VERSION       = ${DUCKDB_PATCH_VERSION}")
+message(STATUS "     DUCKDB_EXPORT_SET          = ${DUCKDB_EXPORT_SET}")

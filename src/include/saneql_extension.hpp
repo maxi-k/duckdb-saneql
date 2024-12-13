@@ -19,6 +19,7 @@ struct SaneqlParseData : public ParserExtensionParseData {
    explicit SaneqlParseData(shared_ptr<SaneAST> ast) : ast(ast) {}
 
    unique_ptr<ParserExtensionParseData> Copy() const override;
+	string ToString() const override;
 };
 //---------------------------------------------------------------------------
 struct SaneqlParserExtension : public ParserExtension {
