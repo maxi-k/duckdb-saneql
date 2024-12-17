@@ -1,22 +1,27 @@
-# DuckDB SaneQL Plugin
+# Saneql
 
-<!--  [![Build](https://github.com/maxi-k/duckdb-saneql/actions/workflows/linux.yml/badge.svg)](https://github.com/maxi-k/duckdb-saneql/actions/workflows/linux.yml) -->
+This repository is based on https://github.com/duckdb/extension-template, check it out if you want to build and ship your own DuckDB extension.
 
-Allows you to type [saneql](https://github.com/neumannt/saneql) directly into a [duckdb](https://github.com/duckdb/duckdb) shell.
+---
+
+This extension, Saneql, allow you to ... <extension_goal>.
+
 
 ## Building
+### Managing dependencies
+DuckDB extensions uses VCPKG for dependency management. Enabling VCPKG is very simple: follow the [installation instructions](https://vcpkg.io/en/getting-started) or just run the following:
+```shell
+git clone https://github.com/Microsoft/vcpkg.git
+./vcpkg/bootstrap-vcpkg.sh
+export VCPKG_TOOLCHAIN_PATH=`pwd`/vcpkg/scripts/buildsystems/vcpkg.cmake
+```
+Note: VCPKG is only required for extensions that want to rely on it for dependency management. If you want to develop an extension without dependencies, or want to do your own dependency management, just skip this step. Note that the example extension uses VCPKG to build with a dependency for instructive purposes, so when skipping this step the build may not work without removing the dependency.
 
 ### Build steps
 Now to build the extension, run:
 ```sh
 make
 ```
-alternatively, pass extra cmake flags like this:
-
-``` sh
-CMAKE_FLAGS="-DCMAKE_CXX_COMPILER=g++" make
-```
-
 The main binaries that will be built are:
 ```sh
 ./build/release/duckdb
@@ -30,22 +35,16 @@ The main binaries that will be built are:
 ## Running the extension
 To run the extension code, simply start the shell with `./build/release/duckdb`.
 
-Now we can use saneql directly in DuckDB: 
+Now we can use the features from the extension directly in DuckDB. The template contains a single scalar function `saneql()` that takes a string arguments and returns a string:
 ```
-D create table foo(a int);              -- regular sql
-D insert into foo values (1), (2), (3); -- regular sql
-D foo.filter(a >= 2)                    -- saneql
-┌───────┐
-│   a   │
-│ int32 │
-├───────┤
-│     2 │
-│     3 │
-└───────┘
+D select saneql('Jane') as result;
+┌───────────────┐
+│    result     │
+│    varchar    │
+├───────────────┤
+│ Saneql Jane 🐥 │
+└───────────────┘
 ```
-
-For a full list of saneql operations, see [the saneql repo](https://github.com/neumannt/saneql/blob/main/algebra.md),
-or checkout the saneql [TPC-H queries](https://github.com/neumannt/saneql/tree/main/examples/tpch).
 
 ## Running the tests
 Different tests can be created for DuckDB extensions. The primary way of testing DuckDB extensions should be the SQL tests in `./test/sql`. These SQL tests can be run using:
@@ -53,10 +52,9 @@ Different tests can be created for DuckDB extensions. The primary way of testing
 make test
 ```
 
-### Loading in an existing duckdb binary
-To install load the extension into a duckdb instance that doesn't have it, you will need to do two things. 
-Firstly, DuckDB should be launched with the `allow_unsigned_extensions` option set to true. 
-How to set this will depend on the client you're using. Some examples:
+### Installing the deployed binaries
+To install your extension binaries from S3, you will need to do two things. Firstly, DuckDB should be launched with the
+`allow_unsigned_extensions` option set to true. How to set this will depend on the client you're using. Some examples:
 
 CLI:
 ```shell
@@ -73,18 +71,16 @@ NodeJS:
 db = new duckdb.Database(':memory:', {"allow_unsigned_extensions": "true"});
 ```
 
-After running these steps, you can install and load your extension using the regular LOAD command in DuckDB:
+Secondly, you will need to set the repository endpoint in DuckDB to the HTTP url of your bucket + version of the extension
+you want to install. To do this run the following SQL query in DuckDB:
 ```sql
-LOAD '/path/to/saneql.duckdb_extension'
+SET custom_extension_repository='bucket.s3.eu-west-1.amazonaws.com/<your_extension_name>/latest';
 ```
+Note that the `/latest` path will allow you to install the latest extension version available for your current version of
+DuckDB. To specify a specific version, you can pass the version instead.
 
-### Always load on the command line
-To always load this plugin into a duckdb instance other than the one built by this repo, create a shell alias:
-``` sh
-alias duckdb='duckdb -unsigned -cmd "LOAD '\''/path/to/saneql.duckdb_extension\''"'
+After running these steps, you can install and load your extension using the regular INSTALL/LOAD commands in DuckDB:
+```sql
+INSTALL saneql
+LOAD saneql
 ```
-
-## Links
-
-You should also check out [PRQL](https://prql-lang.org/) as an SQL alternative.
-Thanks to the [duckdb prql](https://github.com/ywelsch/duckdb-prql) repo, which served as an example of how to put another language into duckdb.

@@ -79,13 +79,13 @@ if __name__ == "__main__":
 
     # rename files
     os.rename(f"test/sql/{string_to_find}.test", f"test/sql/{string_to_replace}.test")
-    os.rename(
-        f"src/{string_to_find}_extension.cpp", f"src/{string_to_replace}_extension.cpp"
-    )
-    os.rename(
-        f"src/include/{string_to_find}_extension.hpp",
-        f"src/include/{string_to_replace}_extension.hpp",
-    )
+    # os.rename(
+    #     f"src/{string_to_find}_extension.cpp", f"src/{string_to_replace}_extension.cpp"
+    # )
+    # os.rename(
+    #     f"src/include/{string_to_find}_extension.hpp",
+    #     f"src/include/{string_to_replace}_extension.hpp",
+    # )
 
     # remove template-specific files
     os.remove(".github/workflows/ExtensionTemplate.yml")
